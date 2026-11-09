@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club de Lectura — Archivo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" type="image/x-icon" href="./favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f8f6f0;
+            --surface: #ffffff;
+            --surface-subtle: #f1ede4;
+            --text: #1c1b18;
+            --text-muted: #6e6a63;
+            --border: #e2ddd3;
+            --border-strong: #c9c2b4;
+            --accent: #2c4c3e;
+            --serif: 'Instrument Serif', Georgia, serif;
+            --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 15px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Cabecera editorial limpia */
+        header {
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .header-inner {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .site-title {
+            font-family: var(--serif);
+            font-size: 1.75rem;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+            color: var(--text);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .site-meta {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        main {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem 5rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Encabezados de sección */
+        .section-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-family: var(--serif);
+            font-size: 1.6rem;
+            font-weight: 400;
+        }
+
+        /* Controles y botones sobrios */
+        .controls-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-quiet {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.35rem 0.75rem;
+            font-family: var(--sans);
+            font-size: 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: border-color 0.15s, color 0.15s, background 0.15s;
+        }
+
+        .btn-quiet:hover {
+            border-color: var(--border-strong);
+            color: var(--text);
+        }
+
+        .btn-quiet.active {
+            background: var(--text);
+            color: var(--bg);
+            border-color: var(--text);
+        }
+
+        .select-clean, .input-clean {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.4rem 0.7rem;
+            font-family: var(--sans);
+            font-size: 0.82rem;
+            border-radius: 4px;
+        }
+
+        .select-clean:focus, .input-clean:focus {
+            outline: none;
+            border-color: var(--text);
+        }
+
+        /* ==========================================
+           SECCIÓN 1: CALENDARIO DE LECTURAS
+           ========================================== */
+        .calendar-block {
+            margin-bottom: 4rem;
+        }
+
+        .cal-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .cal-period-label {
+            font-variant-numeric: tabular-nums;
+            font-weight: 500;
+            font-size: 0.9rem;
+            min-width: 110px;
+            text-align: center;
+        }
+
+        /* Vista Anual (12 meses) */
+        .year-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .month-cell {
+            background: var(--surface);
+            padding: 0.75rem;
+            min-height: 215px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .month-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-bottom: 0.6rem;
+        }
+
+        .month-covers {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            margin-top: auto;
+        }
+
+        .cal-book-entry {
+            width: 100%;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .cal-book-entry.multi {
+            width: calc(50% - 0.25rem);
+        }
+
+        .cal-cover-wrap {
+            aspect-ratio: 2 / 3;
+            width: 100%;
+            background: var(--surface-subtle);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .cal-cover-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.25s ease;
+        }
+
+        .cal-book-entry:hover .cal-cover-wrap img {
+            transform: scale(1.03);
+        }
+
+        .cal-day-tag {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+            display: block;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Vista Mensual (Días de la semana) */
+        .month-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background: var(--surface-subtle);
+            border: 1px solid var(--border);
+            border-bottom: none;
+        }
+
+        .weekday-label {
+            padding: 0.5rem;
+            text-align: center;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .day-cell {
+            background: var(--surface);
+            min-height: 120px;
+            padding: 0.45rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .day-cell.outside {
+            background: var(--bg);
+            color: var(--border-strong);
+        }
+
+        .day-num {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .day-book-thumb {
+            margin-top: 0.35rem;
+            width: 100%;
+            aspect-ratio: 2 / 3;
+            max-width: 72px;
+            align-self: center;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            overflow: hidden;
+            background: var(--surface-subtle);
+        }
+
+        .day-book-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Portada tipográfica de respaldo cuando no hay imagen */
+        .cover-fallback {
+            width: 100%;
+            height: 100%;
+            padding: 0.75rem 0.6rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: var(--surface-subtle);
+            color: var(--text);
+            text-align: left;
+            font-family: var(--serif);
+            line-height: 1.15;
+            font-size: 0.95rem;
+        }
+
+        .cover-fallback span {
+            font-family: var(--sans);
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        /* ==========================================
+           SECCIÓN 2: GRID DE TARJETAS DE LIBROS
+           ========================================== */
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+            gap: 2.25rem 1.5rem;
+        }
+
+        .book-card {
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .book-card-cover {
+            aspect-ratio: 2 / 3;
+            width: 100%;
+            background: var(--surface-subtle);
+            border: 1px solid var(--border);
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+            transition: border-color 0.2s ease;
+        }
+
+        .book-card:hover .book-card-cover {
+            border-color: var(--text);
+        }
+
+        .book-card-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .book-card:hover .book-card-cover img {
+            transform: scale(1.02);
+        }
+
+        .book-card-date {
+            font-size: 0.73rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.2rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .book-card-title {
+            font-family: var(--serif);
+            font-size: 1.2rem;
+            line-height: 1.2;
+            font-weight: 400;
+            margin-bottom: 0.15rem;
+        }
+
+        .book-card-author {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 0.55rem;
+        }
+
+        .book-card-ratings {
+            margin-top: auto;
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-size: 0.8rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .club-score {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .gr-score {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        /* ==========================================
+           VISTA DETALLE: FICHA DEL LIBRO Y NOTAS
+           ========================================== */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 2rem;
+            padding: 0;
+            font-family: var(--sans);
+        }
+
+        .back-link:hover {
+            color: var(--text);
+        }
+
+        .book-sheet {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 3rem;
+            padding-bottom: 3rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 2.5rem;
+        }
+
+        .sheet-cover {
+            aspect-ratio: 2 / 3;
+            width: 100%;
+            border: 1px solid var(--border);
+            background: var(--surface-subtle);
+            overflow: hidden;
+        }
+
+        .sheet-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .sheet-date {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+
+        .sheet-title {
+            font-family: var(--serif);
+            font-size: clamp(2rem, 4vw, 2.75rem);
+            font-weight: 400;
+            line-height: 1.1;
+            margin-bottom: 0.35rem;
+        }
+
+        .sheet-author {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .sheet-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 1rem;
+            padding: 1rem 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .meta-item-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 0.15rem;
+        }
+
+        .meta-item-val {
+            font-weight: 500;
+            font-size: 0.95rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .meta-item-val a {
+            color: var(--text);
+            text-underline-offset: 3px;
+        }
+
+        .sheet-synopsis {
+            font-size: 0.96rem;
+            line-height: 1.65;
+            color: var(--text);
+            max-width: 65ch;
+        }
+
+        /* Tabla limpia de puntuaciones de participantes */
+        .participants-section {
+            max-width: 680px;
+        }
+
+        .participants-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 1rem;
+        }
+
+        .participants-list {
+            border-top: 1px solid var(--border);
+        }
+
+        .participant-row {
+            display: grid;
+            grid-template-columns: 140px 1fr 50px;
+            align-items: center;
+            gap: 1.25rem;
+            padding: 0.85rem 0;
+            border-bottom: 1px solid var(--border);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .participant-name {
+            font-weight: 500;
+        }
+
+        .score-bar-track {
+            height: 4px;
+            background: var(--surface-subtle);
+            width: 100%;
+            position: relative;
+        }
+
+        .score-bar-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            background: var(--accent);
+        }
+
+        .participant-score {
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .participant-row.average-row {
+            border-top: 1px solid var(--text);
+            border-bottom: 1px solid var(--text);
+            font-weight: 600;
+            background: var(--surface-subtle);
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+            margin-top: -1px;
+        }
+
+        .empty-msg {
+            padding: 2.5rem;
+            text-align: center;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        @media (max-width: 820px) {
+            .year-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .book-sheet {
+                grid-template-columns: 1fr;
+                gap: 1.75rem;
+            }
+            .sheet-cover {
+                max-width: 200px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .year-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .books-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem 1rem;
+            }
+            .participant-row {
+                grid-template-columns: 110px 1fr 42px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-inner">
+            <a class="site-title" onclick="navigateHome()">Club de Lectura</a>
+            <span class="site-meta" id="headerStats">Cargando archivo...</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- VISTA PRINCIPAL: CALENDARIO + LISTA DE LIBROS -->
+        <div id="homeView">
+
+            <!-- BLOQUE 1: CALENDARIO -->
+            <section class="calendar-block">
+                <div class="section-bar">
+                    <h2 class="section-title">Calendario de lecturas</h2>
+                    <div class="controls-group">
+                        <div style="margin-right: 0.5rem;">
+                            <button class="btn-quiet active" id="btnModeYear" onclick="setCalendarMode('year')">Anual</button>
+                            <button class="btn-quiet" id="btnModeMonth" onclick="setCalendarMode('month')">Mensual</button>
+                        </div>
+                        <div class="cal-nav">
+                            <button class="btn-quiet" onclick="stepCalendar(-1)" aria-label="Anterior">←</button>
+                            <span class="cal-period-label" id="calPeriodLabel">2026</span>
+                            <button class="btn-quiet" onclick="stepCalendar(1)" aria-label="Siguiente">→</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="calendarContainer"></div>
+            </section>
+
+            <!-- BLOQUE 2: CATÁLOGO DE LIBROS LEÍDOS -->
+            <section>
+                <div class="section-bar">
+                    <h2 class="section-title">Libros leídos</h2>
+                    <div class="controls-group">
+                        <input type="search" id="searchInput" class="input-clean" placeholder="Título o autor..." oninput="renderBooksGrid()">
+                        <select id="sortSelect" class="select-clean" onchange="renderBooksGrid()">
+                            <option value="date-desc">Orden de lectura (más recientes)</option>
+                            <option value="date-asc">Orden de lectura (cronológico)</option>
+                            <option value="club-desc">Puntuación del club (mayor a menor)</option>
+                            <option value="club-asc">Puntuación del club (menor a mayor)</option>
+                            <option value="gr-desc">Nota en Goodreads (mayor a menor)</option>
+                            <option value="title-asc">Título (A–Z)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="booksGrid" class="books-grid"></div>
+            </section>
+        </div>
+
+        <!-- VISTA SECUNDARIA: FICHA DEL LIBRO Y NOTAS -->
+        <div id="bookDetailView" class="hidden">
+            <button class="back-link" onclick="navigateHome()">← Volver al calendario y catálogo</button>
+            <div id="bookDetailContent"></div>
+        </div>
+    </main>
+
+    <script>
+        // Datos de respaldo por si se abre directamente sin servidor local
+        const FALLBACK_BOOKS = [
+            {
+                "id": "nuestra-parte-de-noche",
+                "title": "Nuestra parte de noche",
+                "author": "Mariana Enríquez",
+                "pub_year": 2019,
+                "pages": 666,
+                "read_date": "2026-01-24",
+                "goodreads_rating": 4.35,
+                "goodreads_url": "https://www.goodreads.com/book/show/48715706-nuestra-parte-de-noche",
+                "cover": "covers/nuestra-parte-de-noche.jpg",
+                "synopsis": "Un padre y un hijo atraviesan Argentina por carretera en plena dictadura militar rumbo a las cataratas de Iguazú, huyendo de una sociedad secreta que busca la inmortalidad a través de un médium.",
+                "ratings": { "Laura": 4.5, "Marta": 5.0, "Carmen": 4.5, "Elena": 4.0 }
+            },
+            {
+                "id": "el-ano-del-pensamiento-magico",
+                "title": "El año del pensamiento mágico",
+                "author": "Joan Didion",
+                "pub_year": 2005,
+                "pages": 224,
+                "read_date": "2026-02-21",
+                "goodreads_rating": 3.93,
+                "goodreads_url": "https://www.goodreads.com/book/show/7815.The_Year_of_Magical_Thinking",
+                "cover": "covers/pensamiento-magico.jpg",
+                "synopsis": "Crónica directa y lúcida sobre el duelo tras la muerte repentina de su marido, el también escritor John Gregory Dunne, mientras la hija de ambos permanecía ingresada en coma.",
+                "ratings": { "Laura": 4.0, "Marta": 4.5, "Carmen": 4.0, "Elena": 4.5 }
+            },
+            {
+                "id": "fortuna",
+                "title": "Fortuna",
+                "author": "Hernán Díaz",
+                "pub_year": 2022,
+                "pages": 416,
+                "read_date": "2026-03-28",
+                "goodreads_rating": 3.84,
+                "goodreads_url": "https://www.goodreads.com/book/show/58210933-trust",
+                "cover": "covers/fortuna.jpg",
+                "synopsis": "Cuatro textos contrapuestos reconstruyen la vida y las finanzas de un magnate de Wall Street en los años veinte y el papel invisible de su esposa.",
+                "ratings": { "Laura": 3.5, "Marta": 4.0, "Carmen": 3.5, "Elena": null }
+            }
+        ];
+
+        const MONTHS_ES = [
+            'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+            'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+        ];
+        const MONTHS_SHORT = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+        let books = [];
+        let calendarMode = 'year'; // 'year' o 'month'
+        let activeYear = new Date().getFullYear();
+        let activeMonth = new Date().getMonth(); // 0 - 11
+
+        async function init() {
+            try {
+                const res = await fetch('books.json', { cache: 'no-store' });
+                if (!res.ok) throw new Error();
+                books = await res.json();
+            } catch (e) {
+                books = [...FALLBACK_BOOKS];
+            }
+
+            // Enriquecer cada libro con su nota media del club y un ID seguro
+            books = books.map((b, idx) => ({
+                ...b,
+                id: b.id || slugify(b.title) || `libro-${idx}`,
+                _clubAvg: computeClubAverage(b.ratings)
+            }));
+
+            // Situar el calendario en la fecha del último libro leído
+            const datedBooks = books.filter(b => b.read_date).sort((a, b) => b.read_date.localeCompare(a.read_date));
+            if (datedBooks.length > 0) {
+                const [y, m] = datedBooks[0].read_date.split('-').map(Number);
+                if (y) activeYear = y;
+                if (m) activeMonth = m - 1;
+            }
+
+            updateHeaderStats();
+            renderCalendar();
+            renderBooksGrid();
+
+            window.addEventListener('hashchange', handleRoute);
+            handleRoute();
+        }
+
+        function computeClubAverage(ratingsObj) {
+            if (!ratingsObj) return null;
+            const vals = Object.values(ratingsObj)
+                .filter(v => v !== null && v !== undefined && v !== '' && !isNaN(Number(v)))
+                .map(Number);
+            if (vals.length === 0) return null;
+            return vals.reduce((acc, n) => acc + n, 0) / vals.length;
+        }
+
+        function updateHeaderStats() {
+            const total = books.length;
+            const avgs = books.map(b => b._clubAvg).filter(v => v !== null);
+            const globalAvg = avgs.length
+                ? (avgs.reduce((a, b) => a + b, 0) / avgs.length).toFixed(2)
+                : '—';
+            document.getElementById('headerStats').textContent =
+                `${total} ${total === 1 ? 'libro leído' : 'libros leídos'} · Media global ${globalAvg}`;
+        }
+
+        /* ==========================================
+           RUTEO POR HASH (#libro=id)
+           ========================================== */
+        function handleRoute() {
+            const hash = window.location.hash;
+            if (hash.startsWith('#libro=')) {
+                const id = decodeURIComponent(hash.replace('#libro=', ''));
+                const found = books.find(b => b.id === id);
+                if (found) {
+                    renderBookDetail(found);
+                    document.getElementById('homeView').classList.add('hidden');
+                    document.getElementById('bookDetailView').classList.remove('hidden');
+                    window.scrollTo({ top: 0, behavior: 'instant' });
+                    return;
+                }
+            }
+            document.getElementById('bookDetailView').classList.add('hidden');
+            document.getElementById('homeView').classList.remove('hidden');
+        }
+
+        function openBook(id) {
+            window.location.hash = `libro=${encodeURIComponent(id)}`;
+        }
+
+        function navigateHome() {
+            if (window.location.hash) {
+                history.pushState("", document.title, window.location.pathname + window.location.search);
+            }
+            handleRoute();
+        }
+
+        /* ==========================================
+           CALENDARIO (ANUAL Y MENSUAL)
+           ========================================== */
+        function setCalendarMode(mode) {
+            calendarMode = mode;
+            document.getElementById('btnModeYear').classList.toggle('active', mode === 'year');
+            document.getElementById('btnModeMonth').classList.toggle('active', mode === 'month');
+            renderCalendar();
+        }
+
+        function stepCalendar(delta) {
+            if (calendarMode === 'year') {
+                activeYear += delta;
+            } else {
+                activeMonth += delta;
+                if (activeMonth > 11) { activeMonth = 0; activeYear++; }
+                if (activeMonth < 0) { activeMonth = 11; activeYear--; }
+            }
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const container = document.getElementById('calendarContainer');
+            const label = document.getElementById('calPeriodLabel');
+
+            if (calendarMode === 'year') {
+                label.textContent = String(activeYear);
+                renderYearCalendar(container, activeYear);
+            } else {
+                label.textContent = `${MONTHS_ES[activeMonth]} ${activeYear}`;
+                renderMonthCalendar(container, activeYear, activeMonth);
+            }
+        }
+
+        function renderYearCalendar(container, year) {
+            let html = '<div class="year-grid">';
+            for (let m = 0; m < 12; m++) {
+                const monthPrefix = `${year}-${String(m + 1).padStart(2, '0')}`;
+                const monthBooks = books
+                    .filter(b => b.read_date && b.read_date.startsWith(monthPrefix))
+                    .sort((a, b) => a.read_date.localeCompare(b.read_date));
+
+                const isMulti = monthBooks.length > 1;
+
+                const coversHtml = monthBooks.map(b => {
+                    const dayNum = b.read_date.split('-')[2];
+                    return `
+                        <div class="cal-book-entry ${isMulti ? 'multi' : ''}" onclick="openBook('${escapeAttr(b.id)}')" title="${escapeAttr(b.title)} (${formatFullDate(b.read_date)})">
+                            <div class="cal-cover-wrap">
+                                ${renderCoverImg(b)}
+                            </div>
+                            <span class="cal-day-tag">Día ${Number(dayNum)} · ${escapeHtml(b.title)}</span>
+                        </div>
+                    `;
+                }).join('');
+
+                html += `
+                    <div class="month-cell">
+                        <div class="month-header">
+                            <span>${MONTHS_SHORT[m]}</span>
+                            ${monthBooks.length ? `<span>${monthBooks.length}</span>` : ''}
+                        </div>
+                        <div class="month-covers">
+                            ${coversHtml}
+                        </div>
+                    </div>
+                `;
+            }
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function renderMonthCalendar(container, year, month) {
+            const weekdays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+            const firstDay = new Date(year, month, 1);
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            // Ajustar para que Lunes sea 0 y Domingo sea 6
+            const startOffset = (firstDay.getDay() + 6) % 7;
+
+            let html = `
+                <div class="month-weekdays">
+                    ${weekdays.map(w => `<div class="weekday-label">${w}</div>`).join('')}
+                </div>
+                <div class="days-grid">
+            `;
+
+            for (let i = 0; i < startOffset; i++) {
+                html += `<div class="day-cell outside"></div>`;
+            }
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const dayBooks = books.filter(b => b.read_date === dateStr);
+
+                const thumbsHtml = dayBooks.map(b => `
+                    <div class="day-book-thumb" onclick="openBook('${escapeAttr(b.id)}')" title="${escapeAttr(b.title)}">
+                        ${renderCoverImg(b)}
+                    </div>
+                `).join('');
+
+                html += `
+                    <div class="day-cell">
+                        <span class="day-num">${d}</span>
+                        ${thumbsHtml}
+                    </div>
+                `;
+            }
+
+            const totalCells = startOffset + daysInMonth;
+            const trailing = (7 - (totalCells % 7)) % 7;
+            for (let i = 0; i < trailing; i++) {
+                html += `<div class="day-cell outside"></div>`;
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        /* ==========================================
+           LISTADO DE LIBROS (CARDS + ORDENACIÓN)
+           ========================================== */
+        function renderBooksGrid() {
+            const container = document.getElementById('booksGrid');
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const sortMode = document.getElementById('sortSelect').value;
+
+            let filtered = books.filter(b => {
+                if (!query) return true;
+                return (
+                    (b.title && b.title.toLowerCase().includes(query)) ||
+                    (b.author && b.author.toLowerCase().includes(query))
+                );
+            });
+
+            filtered.sort((a, b) => {
+                switch (sortMode) {
+                    case 'date-asc':
+                        return (a.read_date || '9999').localeCompare(b.read_date || '9999');
+                    case 'club-desc':
+                        return (b._clubAvg ?? -1) - (a._clubAvg ?? -1);
+                    case 'club-asc':
+                        return (a._clubAvg ?? 99) - (b._clubAvg ?? 99);
+                    case 'gr-desc':
+                        return (b.goodreads_rating ?? -1) - (a.goodreads_rating ?? -1);
+                    case 'title-asc':
+                        return a.title.localeCompare(b.title);
+                    case 'date-desc':
+                    default:
+                        return (b.read_date || '').localeCompare(a.read_date || '');
+                }
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="empty-msg" style="grid-column: 1 / -1;">No hay libros que coincidan con la búsqueda.</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(b => {
+                const clubAvgText = b._clubAvg !== null ? b._clubAvg.toFixed(2) : '—';
+                const grText = b.goodreads_rating ? `GR ${Number(b.goodreads_rating).toFixed(2)}` : '';
+
+                return `
+                    <article class="book-card" onclick="openBook('${escapeAttr(b.id)}')">
+                        <div class="book-card-cover">
+                            ${renderCoverImg(b)}
+                        </div>
+                        <div class="book-card-date">${formatShortDate(b.read_date)}</div>
+                        <h3 class="book-card-title">${escapeHtml(b.title)}</h3>
+                        <div class="book-card-author">${escapeHtml(b.author || '')}</div>
+                        <div class="book-card-ratings">
+                            <span class="club-score" title="Promedio del club">★ ${clubAvgText}</span>
+                            <span class="gr-score" title="Calificación en Goodreads">${grText}</span>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        /* ==========================================
+           FICHA INDIVIDUAL DEL LIBRO Y PUNTUACIONES
+           ========================================== */
+        function renderBookDetail(book) {
+            const container = document.getElementById('bookDetailContent');
+            const clubAvgText = book._clubAvg !== null ? book._clubAvg.toFixed(2) : 'Sin calificar';
+            const grText = book.goodreads_rating ? Number(book.goodreads_rating).toFixed(2) : '—';
+
+            const entries = Object.entries(book.ratings || {});
+            // Ordenar participantes de mayor a menor nota (y las pendientes al final)
+            entries.sort((a, b) => {
+                const va = a[1] === null || a[1] === undefined ? -1 : Number(a[1]);
+                const vb = b[1] === null || b[1] === undefined ? -1 : Number(b[1]);
+                return vb - va;
+            });
+
+            const rowsHtml = entries.map(([name, score]) => {
+                const hasScore = score !== null && score !== undefined && score !== '' && !isNaN(Number(score));
+                const num = hasScore ? Number(score) : null;
+                const pct = num !== null ? Math.max(0, Math.min(100, (num / 5) * 100)) : 0;
+
+                return `
+                    <div class="participant-row">
+                        <span class="participant-name">${escapeHtml(name)}</span>
+                        <div class="score-bar-track">
+                            <div class="score-bar-fill" style="width: ${pct}%;"></div>
+                        </div>
+                        <span class="participant-score">${num !== null ? num.toFixed(1) : '—'}</span>
+                    </div>
+                `;
+            }).join('');
+
+            const avgPct = book._clubAvg !== null ? Math.max(0, Math.min(100, (book._clubAvg / 5) * 100)) : 0;
+
+            container.innerHTML = `
+                <div class="book-sheet">
+                    <div class="sheet-cover">
+                        ${renderCoverImg(book)}
+                    </div>
+                    <div>
+                        <div class="sheet-date">Leído el ${formatFullDate(book.read_date)}</div>
+                        <h1 class="sheet-title">${escapeHtml(book.title)}</h1>
+                        <div class="sheet-author">${escapeHtml(book.author || '')}${book.pub_year ? ` · ${book.pub_year}` : ''}</div>
+
+                        <div class="sheet-meta-grid">
+                            <div>
+                                <span class="meta-item-label">Media del club</span>
+                                <span class="meta-item-val">★ ${clubAvgText} <small style="color:var(--text-muted); font-weight:400;">/ 5</small></span>
+                            </div>
+                            <div>
+                                <span class="meta-item-label">Goodreads</span>
+                                <span class="meta-item-val">
+                                    ${book.goodreads_url
+                                        ? `<a href="${escapeAttr(book.goodreads_url)}" target="_blank" rel="noopener">${grText} ↗</a>`
+                                        : grText}
+                                </span>
+                            </div>
+                            ${book.pages ? `
+                            <div>
+                                <span class="meta-item-label">Extensión</span>
+                                <span class="meta-item-val">${escapeHtml(String(book.pages))} págs.</span>
+                            </div>` : ''}
+                        </div>
+
+                        ${book.synopsis ? `<p class="sheet-synopsis">${escapeHtml(book.synopsis)}</p>` : ''}
+                    </div>
+                </div>
+
+                <div class="participants-section">
+                    <div class="participants-header">
+                        <h2 class="section-title">Puntuaciones de las participantes</h2>
+                        <span class="site-meta">${entries.filter(e => e[1] !== null && e[1] !== undefined).length} de ${entries.length} valoraciones</span>
+                    </div>
+
+                    <div class="participants-list">
+                        ${rowsHtml}
+                        <div class="participant-row average-row">
+                            <span>Promedio del club</span>
+                            <div class="score-bar-track">
+                                <div class="score-bar-fill" style="width: ${avgPct}%;"></div>
+                            </div>
+                            <span class="participant-score">${book._clubAvg !== null ? book._clubAvg.toFixed(2) : '—'}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* ==========================================
+           UTILIDADES DE FORMATO E IMÁGENES
+           ========================================== */
+        function renderCoverImg(book) {
+            const fallbackHtml = `
+                <div class="cover-fallback" style="display: none;">
+                    <div>${escapeHtml(book.title)}</div>
+                    <span>${escapeHtml(book.author || '')}</span>
+                </div>
+            `;
+            if (!book.cover) {
+                return `
+                    <div class="cover-fallback">
+                        <div>${escapeHtml(book.title)}</div>
+                        <span>${escapeHtml(book.author || '')}</span>
+                    </div>
+                `;
+            }
+            return `
+                <img src="${escapeAttr(book.cover)}" alt="${escapeAttr(book.title)}"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                ${fallbackHtml}
+            `;
+        }
+
+        function formatShortDate(dateStr) {
+            if (!dateStr) return 'Sin fecha';
+            const [y, m, d] = dateStr.split('-').map(Number);
+            if (!y || !m || !d) return dateStr;
+            return `${d} ${MONTHS_SHORT[m - 1]} ${y}`;
+        }
+
+        function formatFullDate(dateStr) {
+            if (!dateStr) return 'fecha pendiente';
+            const [y, m, d] = dateStr.split('-').map(Number);
+            if (!y || !m || !d) return dateStr;
+            return `${d} de ${MONTHS_ES[m - 1].toLowerCase()} de ${y}`;
+        }
+
+        function slugify(str) {
+            return String(str || '')
+                .toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/(^-|-$)/g, '');
+        }
+
+        function escapeHtml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function escapeAttr(str) {
+            return escapeHtml(str).replace(/'/g, '&#39;');
+        }
+
+        init();
+    </script>
+</body>
+</html>

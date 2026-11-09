@@ -1,0 +1,38 @@
+[
+    {
+        "id": "cosamala",
+        "title": "Cosamala",
+        "author": "Alana S. Portero",
+        "pub_year": 2026,
+        "pages": 666,
+        "read_date": "2026-11-30",
+        "goodreads_rating": 4.35,
+        "goodreads_url": "https://www.goodreads.com/book/show/255016642-cosamala",
+        "cover": "covers/cosamala.jpg",
+        "synopsis": "Andalucía, 1937. La columna Carranza, formada por caballistas, toreros, falangistas, terratenientes y guar­dias civiles, avanza por la sierra norte de Sevilla sub­yugando todo a su paso y empachando la tierra de sangre, como la muerte cabalgando por los campos. Un grupo de mujeres, esposas, madres y vecinas de huidos y perseguidos se inician en el lenguaje oscuro como forma de resistencia y forman un aquelarre con el objetivo de devolver la vida a un país infértil con la ayuda de sus muertos y fantasmas.",
+        "ratings": {
+            "Natalia": 4.5,
+            "Irene": 5.0,
+            "x": 4.5,
+            "y": 4.0
+        }
+    },
+    {
+        "id": "carmilla",
+        "title": "Carmilla",
+        "author": "J. Sheridan Le Fanu",
+        "pub_year": 1872,
+        "pages": 108,
+        "read_date": "2026-10-30",
+        "goodreads_rating": 3.86,
+        "goodreads_url": "https://www.goodreads.com/book/show/48037.Carmilla?ref=nav_sb_ss_1_8",
+        "cover": "covers/carmilla.jpg",
+        "synopsis": "In an isolated castle deep in the Austrian forest, Laura leads a solitary life with only her ailing father for company. Until one moonlit night, a horse-drawn carriage crashes into view, carrying an unexpected guest—the beautiful Carmilla. So begins a feverish friendship between Laura and her mysterious, entrancing companion.",
+        "ratings": {
+            "Natalia": 3.5,
+            "Irene": 4.0,
+            "x": 3.5,
+            "y": 4.0
+        }
+    }
+]
